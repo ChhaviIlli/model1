@@ -232,7 +232,7 @@ async function init(){
 function updateScatterplot(pop_datayear, speed){
 	var width=300, height=300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,3.0]).range([height,0]);
 	var circle = d3.select("#chart").select("svg").selectAll("circle")
                         .data(pop_datayear);	
 	circle.exit().remove();//remove unneeded circles
@@ -257,7 +257,7 @@ function updateScatterplot(pop_datayear, speed){
 function createScatterplot(pop_datayear ){
 	var width=300, height=300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,3.0]).range([height,0]);
 	  var tooltip = d3.select("#my_dataviz")
 	    .append("div")
 	    .style("opacity", 0.5)
@@ -302,7 +302,7 @@ function createScatterplot(pop_datayear ){
 function updateContour(pop_datayear, speed){
 	var width = 300, height = 300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,3.0]).range([height,0]);
 	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
 	  var contours = d3.contourDensity()
 	   .x(function(d,i){return xScale(d.batch_in_test);})
@@ -341,7 +341,7 @@ function updateContour(pop_datayear, speed){
 	function createContour(pop_datayear){
 	var width = 300, height = 300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,0.5,1.0,1.5,2.0,2.5,3.0]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,3.0]).range([height,0]);
 	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
 	  var contours = d3.contourDensity()
 	   .x(function(d,i){return xScale(d.batch_in_test);})
@@ -373,7 +373,7 @@ function update_axis(){
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
 	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
 	var x_axis=d3.axisBottom(xScale).tickValues([10,20,30,40,50,60]).tickFormat(d3.format(".0f"));
-	var y_axis=d3.axisLeft(yScale).tickValues([0,0.5,1.0,1.5,2.0,2.5]).tickFormat(d3.format(".1f"));	  
+	var y_axis=d3.axisLeft(yScale)//.tickValues([]).tickFormat(d3.format(".1f"));	  
 	  // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
 	  // Its opacity is set to 0: we don't see it by default.
 	
@@ -450,13 +450,6 @@ function init_helper(){
 	var svg = d3.select(chart).append("svg")
         	    .attr("width", canvas_width )
 	            .attr("height", canvas_height );
-	d3.select("#chart").select("svg").append('text')
-	    .attr('x', xScale(70))
-	    .attr('y', 10)
-	    .attr('transform', 'rotate(10)')
-	    .attr('text-anchor', 'begin')
-            .attr("font-size",8)
-	    .text();
 	
 	createContour(data_preprocessed_1998);
 	createScatterplot(data_preprocessed_1998 );
