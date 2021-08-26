@@ -371,7 +371,7 @@ function update_axis(){
         var canvas_width = 400, canvas_height = 400;        
 	var width = canvas_height - 100,height=canvas_height -100, margin = 50;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,10]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
 	var x_axis=d3.axisBottom(xScale).tickValues([10,20,30,40,50,60]).tickFormat(d3.format(".0f"));
 	var y_axis=d3.axisLeft(yScale).tickValues([0,0.5,1.0,1.5,2.0,2.5]).tickFormat(d3.format(".1f"));	  
 	  // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
