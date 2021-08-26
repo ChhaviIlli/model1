@@ -232,7 +232,7 @@ async function init(){
 function updateScatterplot(pop_datayear, speed){
 	var width=300, height=300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
 	var circle = d3.select("#chart").select("svg").selectAll("circle")
                         .data(pop_datayear);	
 	circle.exit().remove();//remove unneeded circles
@@ -257,7 +257,7 @@ function updateScatterplot(pop_datayear, speed){
 function createScatterplot(pop_datayear ){
 	var width=300, height=300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
 	  var tooltip = d3.select("#my_dataviz")
 	    .append("div")
 	    .style("opacity", 0.5)
@@ -302,7 +302,7 @@ function createScatterplot(pop_datayear ){
 function updateContour(pop_datayear, speed){
 	var width = 300, height = 300;
 	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,0.5,1,1.5,2.0,2.5,3.0]).range([height,0]);
 	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
 	  var contours = d3.contourDensity()
 	   .x(function(d,i){return xScale(d.batch_in_test);})
@@ -341,7 +341,7 @@ function updateContour(pop_datayear, speed){
 	function createContour(pop_datayear){
 	var width = 300, height = 300;
 	var xScale=d3.scaleLinear().domain([0,67]).range([0,width]);
-	var yScale=d3.scaleLinear().domain([0,3]).range([height,0]);
+	var yScale=d3.scaleLinear().domain([0,0.5,1.0,1.5,2.0,2.5,3.0]).range([height,0]);
 	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
 	  var contours = d3.contourDensity()
 	   .x(function(d,i){return xScale(d.batch_in_test);})
@@ -404,7 +404,7 @@ function update_axis(){
 	  .attr("x2", xScale(0))
 	  .attr("x1", xScale(70))
 	  .attr("y2", yScale(0))
-	  .attr("y1", yScale(10))
+	  .attr("y1", yScale(3))
 	  .attr("stroke-width", 3);
 	
 }
