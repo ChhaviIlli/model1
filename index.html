@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- d3 version 5 -->
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+* {box-sizing: border-box}
+body {font-family: Verdana, sans-serif; margin:0}
+.mySlides {display: none}
+img {vertical-align: middle;}
+	
+/* Slideshow container */
+.slideshow-container {
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: black;
+  background-color: white;
+  font-weight: bold;
+  font-size: 12px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+  background-color: black;/*rgba(0,0,0,0.8);*/
+  color: white;
+}
+
+/* Caption text */
+.text {
+  color: #f2f2f2;
+  font-size: 10px;
+  padding: 8px 10px;
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #f2f2f2;
+  font-size: 10px;
+  padding: 8px 10px;
+  position: absolute;
+  top: 0;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+.fade {
+  -webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;
+  animation-name: fade;
+  animation-duration: 1.5s;
+}
+
+@-webkit-keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+@keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}
+
+/* On smaller screens, decrease text size */
+@media only screen and (max-width: 300px) {
+  .prev, .next,.text {font-size: 11px}
+}
+</style>
+</head>
+<body onload="init()">
+
+<div class="slideshow-container">
+
+<div class="mySlides fade">
+  <div class="numbertext">1 / 3</div>
+     <div>
+         <p>
+               <h1>Training Loss per Epoc</h1>
+                This scene shows loss across across batches for Epoc<b> 0 </b>.
+	        Contour map is showing the density of batches near given loss value. Place mouseover data point to check exact value of loss.
+                <i>Data is taken from model1.</i><br/>
+         </p>
+     </div>
+     <div class="text">"Epoc 0"</div>
+     
+</div>
+
+<div class="mySlides fade">
+  <div class="numbertext">2 / 3</div>
+    <div>
+	<p> 
+		<h1>Training Loss per Epoc</h1>
+	    	This scene shows loss across batches for Epoc<b> 20 </b>.
+	        Contour map is showing the density of batches near given loss value. Place mouseover data point to check exact value of loss.
+                <i>Data is taken from model1.</i><br/>
+                
+	</p>
+    </div>
+    <div class="text">"Epoc 20"</div>
+   
+</div>
+
+<div class="mySlides fade">
+  <div class="numbertext">3 / 3</div>
+	<div>
+	<p> 
+		<h1>Training Loss per Epoc- Data Animation</h1>
+                This scene shows loss across batches for Epoc starting from <b> Epoc 0 and going to Epoc 120 </b>.
+                <i>Data is taken from model1.</i><br/>
+	</p>
+    </div>
+  <div class="text">Caption Three</div>
+</div>
+<div id="chart" align="center"></div>
+<a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+<a class="next" onclick="plusSlides(1)">&#10095;</a>
+
+</div>
+<br>
+
+<div style="text-align:center">
+  <span class="dot" onclick="currentSlide(1)"></span> 
+  <span class="dot" onclick="currentSlide(2)"></span> 
+  <span class="dot" onclick="currentSlide(3)"></span> 
+</div>
+
+<script>
+
+var slideIndex = 1;
+showSlides(slideIndex);
+
+function plusSlides(n) {
+  showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+  showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+  var i;
+  var slides = document.getElementsByClassName("mySlides");
+  var dots = document.getElementsByClassName("dot");
+  if (n > slides.length) {slideIndex = 1}    
+  if (n < 1) {slideIndex = slides.length}
+  for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";  
+  }
+  for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+  }
+  slides[slideIndex-1].style.display = "block";  
+  dots[slideIndex-1].className += " active";
+  load_data();
+}
+var data_preprocessed_1998 = null;
+var data_preprocessed_2003 = null;
+var data_preprocessed_2008 = null;
+var data_preprocessed_2013 = null;
+var data_preprocessed_2018 = null;
+async function init(){
+	const pop_data = await d3.csv('WPP2019_Period_Indicators_Medium.csv');
+	data_preprocessed = pop_data
+	data_preprocessed_1998 = data_preprocessed.filter(function(d){
+				          if(d["epoc"]=="0"){
+        					return d;
+				          }})
+	
+	data_preprocessed_2003 = data_preprocessed.filter(function(d){
+				          if(d["epoc"]=="20"){
+        					return d;
+				          }})
+	
+	data_preprocessed_2008 = data_preprocessed.filter(function(d){
+				          if(d["epoc"]=="40"){
+        					return d;
+				          }})
+	
+	data_preprocessed_2013 = data_preprocessed.filter(function(d){
+				          if(d["epoc"]=="60"){
+        					return d;
+				          }})
+	
+	data_preprocessed_2018 = data_preprocessed.filter(function(d){
+				          if(d["epoc"]=="120"){
+        					return d;
+				          }})
+	
+	
+	init_helper();
+}
+
+function updateScatterplot(pop_datayear, speed){
+	var width=300, height=300;
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([height,0]);
+	var circle = d3.select("#chart").select("svg").selectAll("circle")
+                        .data(pop_datayear);	
+	circle.exit().remove();//remove unneeded circles
+        circle.enter().append("circle")
+                        .attr("r",0);//create any new circles needed
+	//update all circles to new positions
+	if(speed == "fast"){
+         circle.transition()
+                        .duration(10)
+                        .attr("cx",function(d){return xScale(d.batch_in_test);})
+                        .attr("cy",function(d){return yScale(d.loss);})
+                        .attr("r",4);	}
+	else{
+		circle.transition()
+                        .duration(5000)
+                        .attr("cx",function(d){return xScale(d.batch_in_test);})
+                        .attr("cy",function(d){return yScale(d.loss);})
+                        .attr("r",4);
+	}
+}
+
+function createScatterplot(pop_datayear ){
+	var width=300, height=300;
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([height,0]);
+	  var tooltip = d3.select("#my_dataviz")
+	    .append("div")
+	    .style("opacity", 0.5)
+	    .attr("class", "tooltip")
+	    .style("background-color", "white")
+	    .style("border", "solid")
+	    .style("border-width", "1px")
+	    .style("border-radius", "5px")
+	    .style("padding", "10px")
+
+	  // A function that change this tooltip when the user hover a point.
+	  // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+	  var mouseover = function(d) {
+	    tooltip.style("opacity", 1) }
+
+	  var mousemove = function(d) {
+	    tooltip.html(d.loss)
+	      .style("left", (d3.mouse(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+	      .style("top", (d3.mouse(this)[1]) + "px") }
+
+	  // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+	  var mouseleave = function(d) {
+	    tooltip.transition().duration(200).style("opacity", 0)
+	  }
+	 
+	
+	var g = d3.select("#chart").select("svg").append("g");
+		g.attr("transform","translate(50,50)")
+		  .selectAll('circle')
+		  .data(pop_datayear)
+		  .enter().append("circle")
+		  .attr("cx",function(d) {return xScale(d.batch_in_test);})
+		   .attr("cy",function(d) {return yScale(d.loss);})
+		   .attr("r",4)
+	           .append("title")
+	           .text(d => d.loss)
+	    	.on("mouseover", function(){
+			d3.select(this).attr('stroke', 'black').attr('stroke-width',1);})
+    		.on("mouseout", function(){
+			d3.select(this).attr('stroke', null);})	}
+	
+function updateContour(pop_datayear, speed){
+	var width = 300, height = 300;
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([height,0]);
+	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
+	  var contours = d3.contourDensity()
+	   .x(function(d,i){return xScale(d.batch_in_test);})
+	  .y(function(d,i){return yScale(d.loss);})
+	 .size([width,height])
+	.bandwidth(20)
+	  (pop_datayear);
+	
+	var path = d3.select("#chart").select("svg").selectAll("path")
+                        .data(contours);	
+	path.exit().remove();//remove unneeded path
+        path.enter().append("path")
+                       .attr("r",0);//create any new paths needed
+	//update all paths to new positions
+	 if (speed == "fast"){
+		 path.transition()
+				.duration(10)
+				.attr("class", "contour")
+				.attr("stroke","green")
+				.attr("stroke-opacity", 0)
+				.attr("fill",  function(d){return color(d.value);})
+				.attr("fill-opacity", 0.10)
+				.attr("d", d3.geoPath());
+         }
+	 else{
+		 	 path.transition()
+				.duration(5000)
+				.attr("class", "contour")
+				.attr("stroke","green")
+				.attr("stroke-opacity", 0)
+				.attr("fill",  function(d){return color(d.value);})
+				.attr("fill-opacity", 0.10)
+				.attr("d", d3.geoPath());}
+	 }
+	
+	function createContour(pop_datayear){
+	var width = 300, height = 300;
+	var xScale=d3.scaleLinear().domain([0,67]).range([0,width]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([height,0]);
+	var color = d3.scaleSequential(d3.interpolateTurbo).domain([0.000, 124]); 
+	  var contours = d3.contourDensity()
+	   .x(function(d,i){return xScale(d.batch_in_test);})
+	   .y(function(d,i){return yScale(d.loss);})
+	   .size([width,height])
+	   .bandwidth(20)
+	  (pop_datayear);
+	
+	
+	 var g  = d3.select("#chart").select("svg").append("g");
+	   g.attr("transform","translate(50,50)")
+	  .selectAll("path")
+	  .data(contours)
+	  .enter()
+	  .append("path")
+	  .attr("class", "contour")
+	  .attr("stroke","green")
+	  .attr("stroke-opacity", 0)
+	  .attr("fill",  function(d){return color(d.value);})
+	  .attr("fill-opacity", 0.10)
+	  .attr("d", d3.geoPath());}
+
+
+function update_axis(){
+	var svg = d3.select("#chart").select("svg");
+	
+        var canvas_width = 400, canvas_height = 400;        
+	var width = canvas_height - 100,height=canvas_height -100, margin = 50;
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,width]);
+	var yScale=d3.scaleLinear().domain([0,10]).range([height,0]);
+	var x_axis=d3.axisBottom(xScale).tickValues([10,20,30,40,50,60]).tickFormat(d3.format(".0f"));
+	var y_axis=d3.axisLeft(yScale).tickValues([0,1,2,3,4,5,6,7,8,9]).tickFormat(d3.format(".0f"));	  
+	  // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+	  // Its opacity is set to 0: we don't see it by default.
+	
+	d3.select("#chart").select("svg").append('text')
+           .attr('x', -(height / 2) - margin)
+           .attr('y', margin / 2.4)
+           .attr('transform', 'rotate(-90)')
+           .attr('text-anchor', 'middle')
+           .text('Loss');
+
+	d3.select("#chart").select("svg").append('text')
+	    .attr('x', width / 2 + margin)
+	    .attr('y', height+margin+margin)
+	    .attr('text-anchor', 'middle')
+	    .text('batch#');
+	
+	var g = d3.select("#chart").select("svg").append("g");
+	    g.attr("transform","translate(50,50)").call(y_axis);
+	    
+  
+	var g = d3.select("#chart").select("svg").append("g");
+	   g.attr("transform","translate(50,"+(width+margin)+")").call(x_axis);
+	   
+	var g = d3.select("#chart").select("svg").append("g");
+	  g.attr("transform","translate(50,50)")
+	  .append("line")
+	  .attr("style", "stroke:black")
+	  .attr("x2", xScale(0))
+	  .attr("x1", xScale(70))
+	  .attr("y2", yScale(0))
+	  .attr("y1", yScale(10))
+	  .attr("stroke-width", 3);
+	
+}
+function tooltip_available(){
+	  d3.select("#chart").select("svg")
+      		.on("mouseover", function(){
+          	d3.select(this)
+            	.style("background-color", "grey");})
+	      	.on("mouseout", function(){
+          	d3.select(this)
+            	.style("background-color", "white");})
+}
+function load_data(){
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,300]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([300,0]);
+	d3.select("#chart").select("svg").append('text')
+	    .attr('x', xScale(67))
+	    .attr('y', 2.0)
+	    .attr('transform', 'rotate(10)')
+	    .attr('text-anchor', 'begin')
+            .attr("font-size",8)
+	    .text('');
+	if(slideIndex==1){
+		updateContour(data_preprocessed_1998, "fast");
+		updateScatterplot(data_preprocessed_1998, "fast");
+	}
+	else if(slideIndex == 2){
+	        updateContour(data_preprocessed_2003, "fast");
+		updateScatterplot(data_preprocessed_2003, "fast");
+	}
+	else{
+	     updateContour(data_preprocessed_1998, "fast");
+	     updateScatterplot(data_preprocessed_1998, "fast");
+	     updateContour(data_preprocessed_2003, "slow");
+	     updateScatterplot(data_preprocessed_2003,"slow");
+	     updateContour(data_preprocessed_2008, "slow");
+	     updateScatterplot(data_preprocessed_2008, "slow");
+	     updateContour(data_preprocessed_2013, "slow");
+	     updateScatterplot(data_preprocessed_2013, "slow");
+	     updateContour(data_preprocessed_2018, "slow");
+	     updateScatterplot(data_preprocessed_2018, "slow");
+	}
+	update_axis();
+}
+					     
+function init_helper(){	
+	//console.log(pop_data2018);
+	var xScale=d3.scaleLinear().domain([0,70]).range([0,300]);
+	var yScale=d3.scaleLinear().domain([0,1,2,3,4,5,6,7,8,9]).range([300,0]);
+
+	var canvas_width = 400, canvas_height = 400;
+	var svg = d3.select(chart).append("svg")
+        	    .attr("width", canvas_width )
+	            .attr("height", canvas_height );
+	d3.select("#chart").select("svg").append('text')
+	    .attr('x', xScale(70))
+	    .attr('y', 10)
+	    .attr('transform', 'rotate(10)')
+	    .attr('text-anchor', 'begin')
+            .attr("font-size",8)
+	    .text();
+	
+	createContour(data_preprocessed_1998);
+	createScatterplot(data_preprocessed_1998 );
+	update_axis();
+	tooltip_available();
+}
+</script>
+
+</body>
+</html>
